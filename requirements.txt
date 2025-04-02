@@ -1,1 +1,5 @@
+nextcord
+python-dotenv
+openpyxl
+asyncio
 

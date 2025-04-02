@@ -11,7 +11,7 @@ import asyncio
 intents = nextcord.Intents.default()
 intents.message_content = True  # 메시지 읽기 활성화
 
-load_dotenv(dotenv_path="C:/Users/이정연/OneDrive/바탕 화면/Bot/.env")
+load_dotenv()
 TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 
 bot = commands.AutoShardedBot(command_prefix="!", intents=intents, help_command=None)

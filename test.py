@@ -571,7 +571,7 @@ async def 내피드(ctx):
         else:
             title = "👤 일반인"
 
-        embed = nextcord.Embed(title="📱 내 인스타 피드", color=0xbf74fd)
+        embed = nextcord.Embed(title="📱 내 디스타그램 피드", color=0xbf74fd)
         embed.add_field(name="이름", value=name, inline=False)
         embed.add_field(name="📈 팔로워", value=str(follower), inline=True)
         embed.add_field(name="📉 팔로잉", value=str(following), inline=True)

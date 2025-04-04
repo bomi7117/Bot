@@ -531,7 +531,7 @@ async def 게시물올리기(ctx):
         await ctx.send(f"에러 발생: {e}")
 
 
-@bot.slash_command(name="내피드", description="자신의 인스타 피드를 확인합니다.")
+@bot.slash_command(name="내피드", description="자신의 디스타그램 피드를 확인합니다.")
 async def 내피드(ctx):
     excel_file = "data.xlsx"
     user_id = str(ctx.user.id)

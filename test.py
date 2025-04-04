@@ -470,6 +470,196 @@ async def delete_messages(
         await ctx.followup.send("❌ 관리자만 사용할 수 있는 명령어입니다.", ephemeral=True)
 
 
+@bot.slash_command(name="게시물올리기", description="디스타그램에 게시물을 올립니다.")
+async def 게시물올리기(ctx):
+    success = [
+        "멋진 오운완 사진", "감성 카페에서 찍은 한 컷", "그냥 외모가 원인",
+        "해시태그 전략이 제대로 먹혔다", "스토리 공유 이벤트 덕분에 떡상"
+    ]
+    fail = [
+        "감성글 썼다가 감성팔이로 오해받음", "무심코 한 말이 트리거", "과한 보정",
+        "정치 얘기 살짝 해버림", "짜증나는 광고같이 보임"
+    ]
+    neutral = [
+        "이상하게 이 사진은 다들 무시함", "알고리즘이 나를 버림", "업로드 시간 실패",
+        "너무 자주 올렸더니 피로감 온 듯", "감성 폭발했는데 나만 느낌"
+    ]
+
+    result = random.choice(["good", "bad", "neutral"])
+    excel_file = "data.xlsx"
+    user_id = str(ctx.user.id)
+
+    try:
+        wb = openpyxl.load_workbook(excel_file)
+        ws = wb.active
+
+        row = None
+        for i in range(1, ws.max_row + 1):
+            if str(ws.cell(i, 1).value) == user_id:
+                row = i
+                break
+        if not row:
+            await ctx.send("❗가입하지 않은 사용자입니다.")
+            return
+
+        follower = int(ws.cell(row, 4).value or 0)
+        like = int(ws.cell(row, 6).value or 0)
+        hate = int(ws.cell(row, 7).value or 0)
+
+        if result == "good":
+            origin = random.choice(success)
+            follower += 10
+            like += 30
+            msg = f"📈 알고리즘을 탔습니다!\n(원인: {origin})\n+10 Follower / +30 Like"
+        elif result == "bad":
+            origin = random.choice(fail)
+            follower -= 10
+            hate += 30
+            msg = f"📉 논란의 여지가 있는 사진이네요...\n(원인: {origin})\n-10 Follower / +30 Hate"
+        else:
+            origin = random.choice(neutral)
+            msg = f"😐 이목을 끌지 못했어요..\n(원인: {origin})\n+0 Follower / +0 Like"
+
+        ws.cell(row, 4).value = follower
+        ws.cell(row, 6).value = like
+        ws.cell(row, 7).value = hate
+        wb.save(excel_file)
+
+        await ctx.send(embed=nextcord.Embed(title="📸 게시물 업로드", description=msg, color=0xff76c3))
+    
+    except Exception as e:
+        await ctx.send(f"에러 발생: {e}")
+
+
+@bot.slash_command(name="내피드", description="자신의 인스타 피드를 확인합니다.")
+async def 내피드(ctx):
+    excel_file = "data.xlsx"
+    user_id = str(ctx.user.id)
+
+    try:
+        wb = openpyxl.load_workbook(excel_file)
+        ws = wb.active
+
+        row = None
+        for i in range(1, ws.max_row + 1):
+            if str(ws.cell(i, 1).value) == user_id:
+                row = i
+                break
+
+        if row is None:
+            await ctx.send("❗가입하지 않은 사용자입니다.")
+            return
+
+        name = ws.cell(row, 2).value or "이름 없음"
+        follower = int(ws.cell(row, 4).value or 0)
+        following = int(ws.cell(row, 5).value or 0)
+        like = int(ws.cell(row, 6).value or 0)
+        hate = int(ws.cell(row, 7).value or 0)
+
+        if follower >= 10000:
+            title = "🎤 연예인"
+        elif follower >= 5000:
+            title = "🌟 인플루언서"
+        elif follower >= 1000:
+            title = "🔥 라이징스타"
+        elif hate >= 10000:
+            title = "💀 혐오유발자"
+        elif hate >= 5000:
+            title = "🦇 다크나이트"
+        elif hate >= 1000:
+            title = "💢 불행전달자"
+        else:
+            title = "👤 일반인"
+
+        embed = nextcord.Embed(title="📱 내 인스타 피드", color=0xbf74fd)
+        embed.add_field(name="이름", value=name, inline=False)
+        embed.add_field(name="📈 팔로워", value=str(follower), inline=True)
+        embed.add_field(name="📉 팔로잉", value=str(following), inline=True)
+        embed.add_field(name="❤️ 좋아요", value=str(like), inline=True)
+        embed.add_field(name="💔 싫어요", value=str(hate), inline=True)
+        embed.add_field(name="🏷️ 칭호", value=title, inline=False)
+
+        await ctx.send(embed=embed)
+
+    except Exception as e:
+        await ctx.send(f"에러 발생: {e}")
+
+
+@bot.slash_command(name="이벤트", description="랜덤 이벤트가 발생합니다")
+async def 이벤트(ctx):
+    import random
+    excel_file = "data.xlsx"
+    user_id = str(ctx.user.id)
+
+    try:
+        wb = openpyxl.load_workbook(excel_file)
+        ws = wb.active
+
+        row = None
+        for i in range(1, ws.max_row + 1):
+            if str(ws.cell(i, 1).value) == user_id:
+                row = i
+                break
+
+        if row is None:
+            await ctx.send("❗가입하지 않은 사용자입니다.")
+            return
+
+        follower = int(ws.cell(row, 4).value or 0)
+        following = int(ws.cell(row, 5).value or 0)
+        like = int(ws.cell(row, 6).value or 0)
+        hate = int(ws.cell(row, 7).value or 0)
+
+        events = [
+            ("📺 방송에 출연했어요!", 1000, 0, 1000, 0, 0.1),
+            ("💸 팔로워 구매에 홀렸어요...", 200, 0, 0, 100, 5),
+            ("🔓 해킹을 당했어요 (팔로잉)", -50, 200, 100, 0, 5),
+            ("📈 릴스가 떡상했어요!", 100, 0, 500, 0, 10),
+            ("❌ 해킹을 당했어요 (계정)", -follower, -following, -like, -hate, 0.1),
+            ("🏢 기획사에 들어갔어요!", 500, 0, 500, 0, 0.4),
+            ("🧹 팔로잉을 정리했어요!", 0, -100, 0, 50, 0.4),
+            ("🗯️ 혐오발언을 했어요...", -200, 0, 0, 500, 4.5),
+            ("❤️ 기부 사진을 올렸어요!", 200, 0, 1000, 0, 4.5),
+            ("📶 소소한 오름", 1, 0, 1, 0, 45),
+            ("💤 아무 일도 없었어요", 0, 0, 0, 0, 45),
+        ]
+
+        weights = [e[5] for e in events]
+        selected = random.choices(events, weights=weights, k=1)[0]
+        name, f_change, fg_change, l_change, h_change, _ = selected
+  
+        if name == "❌ 해킹을 당했어요 (계정)":
+            follower, following, like, hate = 0, 0, 0, 0
+        else:
+            follower += f_change
+            following += fg_change
+            like += l_change
+            hate += h_change
+
+        # 값 저장
+        ws.cell(row, 4, follower)
+        ws.cell(row, 5, following)
+        ws.cell(row, 6, like)
+        ws.cell(row, 7, hate)
+        wb.save(excel_file)
+
+        embed = nextcord.Embed(title="🎲 이벤트 발생!", description=name, color=0xffdf7c)
+        if name == "💤 아무 일도 없었어요":
+            embed.add_field(name="🥱", value="정말 아무 일도 없었어요...", inline=False)
+        else:
+            embed.add_field(name="📊 변화량", value=
+                f"📈 팔로워: {f_change:+}\n"
+                f"📉 팔로잉: {fg_change:+}\n"
+                f"❤️ 좋아요: {l_change:+}\n"
+                f"💔 싫어요: {h_change:+}", inline=False
+            )
+
+        await ctx.send(embed=embed)
+
+    except Exception as e:
+        await ctx.send(f"에러 발생: {e}")
+
+
 @bot.command(name="닉네임변경")
 async def 닉네임변경(ctx, *, 새_닉네임: str):
     # ✅ 봇이 닉네임 변경 권한을 가지고 있는지 확인

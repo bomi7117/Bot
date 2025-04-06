@@ -576,7 +576,7 @@ async def 내피드(ctx):
             await ctx.send("❗가입하지 않은 사용자입니다.")
             return
 
-        on_cd, secs_left = is_on_cooldown(ws, row, 9, 0.5)  # 3분 쿨타임 예시
+        on_cd, secs_left = is_on_cooldown(ws, row, 9, 0.17)  
         if on_cd:
             mins = secs_left // 60
             secs = secs_left % 60
@@ -621,7 +621,7 @@ async def 내피드(ctx):
         await ctx.send(f"에러 발생: {e}")
 
 
-@bot.slash_command(name="이벤트", description="랜덤 이벤트가 발생합니다")
+@bot.slash_command(name="이벤트", description="랜덤 이벤트가 발생합니다(쿨타임 : 1시간)")
 async def 이벤트(ctx):
     import random
     excel_file = "data.xlsx"
@@ -641,7 +641,7 @@ async def 이벤트(ctx):
             await ctx.send("❗가입하지 않은 사용자입니다.")
             return
 
-        on_cd, secs_left = is_on_cooldown(ws, row, 10, 0.5)  # 3분 쿨타임 예시
+        on_cd, secs_left = is_on_cooldown(ws, row, 10, 60)  # 3분 쿨타임 예시
         if on_cd:
             mins = secs_left // 60
             secs = secs_left % 60

@@ -486,7 +486,7 @@ def is_on_cooldown(sheet, row, col, cooldown_minutes):
     return False, 0
 
 
-@bot.slash_command(name="게시물올리기", description="디스타그램에 게시물을 올립니다.(쿨타임 : 30초)")
+@bot.slash_command(name="게시물올리기", description="디스타그램에 게시물을 올립니다.(쿨타임 : 15초)")
 async def 게시물올리기(ctx):
     success = [
         "멋진 오운완 사진", "감성 카페에서 찍은 한 컷", "그냥 외모가 원인",
@@ -518,7 +518,7 @@ async def 게시물올리기(ctx):
             await ctx.send("❗가입하지 않은 사용자입니다.")
             return
 
-        on_cd, secs_left = is_on_cooldown(ws, row, 8, 0.5)  
+        on_cd, secs_left = is_on_cooldown(ws, row, 8, 0.25)  
         if on_cd:
             mins = secs_left // 60
             secs = secs_left % 60

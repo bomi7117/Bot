@@ -470,7 +470,23 @@ async def delete_messages(
         await ctx.followup.send("❌ 관리자만 사용할 수 있는 명령어입니다.", ephemeral=True)
 
 
-@bot.slash_command(name="게시물올리기", description="디스타그램에 게시물을 올립니다.")
+def is_on_cooldown(sheet, row, col, cooldown_minutes):
+    last_time_str = sheet.cell(row=row, column=col).value
+    now = datetime.now()
+
+    if last_time_str:
+        try:
+            last_time = datetime.strptime(str(last_time_str), "%Y-%m-%d %H:%M:%S")
+            remaining = (last_time + timedelta(minutes=cooldown_minutes)) - now
+            if remaining.total_seconds() > 0:
+                return True, int(remaining.total_seconds())
+        except ValueError:
+            pass
+
+    return False, 0
+
+
+@bot.slash_command(name="게시물올리기", description="디스타그램에 게시물을 올립니다.(쿨타임 : 30초)")
 async def 게시물올리기(ctx):
     success = [
         "멋진 오운완 사진", "감성 카페에서 찍은 한 컷", "그냥 외모가 원인",
@@ -502,6 +518,14 @@ async def 게시물올리기(ctx):
             await ctx.send("❗가입하지 않은 사용자입니다.")
             return
 
+        on_cd, secs_left = is_on_cooldown(ws, row, 8, 0.5)  
+        if on_cd:
+            mins = secs_left // 60
+            secs = secs_left % 60
+            await ctx.send(f"⏳ 쿨타임입니다. {mins}분 {secs}초 후에 다시 시도해주세요.", ephemeral=True)
+            return
+
+
         follower = int(ws.cell(row, 4).value or 0)
         like = int(ws.cell(row, 6).value or 0)
         hate = int(ws.cell(row, 7).value or 0)
@@ -523,6 +547,8 @@ async def 게시물올리기(ctx):
         ws.cell(row, 4).value = follower
         ws.cell(row, 6).value = like
         ws.cell(row, 7).value = hate
+
+        ws.cell(row, 8).value = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         wb.save(excel_file)
 
         await ctx.send(embed=nextcord.Embed(title="📸 게시물 업로드", description=msg, color=0xff76c3))
@@ -531,7 +557,7 @@ async def 게시물올리기(ctx):
         await ctx.send(f"에러 발생: {e}")
 
 
-@bot.slash_command(name="내피드", description="자신의 디스타그램 피드를 확인합니다.")
+@bot.slash_command(name="내피드", description="자신의 디스타그램 피드를 확인합니다.(쿨타임 : 10초")
 async def 내피드(ctx):
     excel_file = "data.xlsx"
     user_id = str(ctx.user.id)
@@ -548,6 +574,13 @@ async def 내피드(ctx):
 
         if row is None:
             await ctx.send("❗가입하지 않은 사용자입니다.")
+            return
+
+        on_cd, secs_left = is_on_cooldown(ws, row, 9, 0.5)  # 3분 쿨타임 예시
+        if on_cd:
+            mins = secs_left // 60
+            secs = secs_left % 60
+            await ctx.send(f"⏳ 쿨타임입니다. {mins}분 {secs}초 후에 다시 시도해주세요.", ephemeral=True)
             return
 
         name = ws.cell(row, 2).value or "이름 없음"
@@ -579,6 +612,9 @@ async def 내피드(ctx):
         embed.add_field(name="💔 싫어요", value=str(hate), inline=True)
         embed.add_field(name="🏷️ 칭호", value=title, inline=False)
 
+        ws.cell(row, 9).value = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        wb.save(excel_file)
+
         await ctx.send(embed=embed)
 
     except Exception as e:
@@ -603,6 +639,13 @@ async def 이벤트(ctx):
 
         if row is None:
             await ctx.send("❗가입하지 않은 사용자입니다.")
+            return
+
+        on_cd, secs_left = is_on_cooldown(ws, row, 10, 0.5)  # 3분 쿨타임 예시
+        if on_cd:
+            mins = secs_left // 60
+            secs = secs_left % 60
+            await ctx.send(f"⏳ 쿨타임입니다. {mins}분 {secs}초 후에 다시 시도해주세요.", ephemeral=True)
             return
 
         follower = int(ws.cell(row, 4).value or 0)
@@ -641,6 +684,7 @@ async def 이벤트(ctx):
         ws.cell(row, 5, following)
         ws.cell(row, 6, like)
         ws.cell(row, 7, hate)
+        ws.cell(row, 10).value = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         wb.save(excel_file)
 
         embed = nextcord.Embed(title="🎲 이벤트 발생!", description=name, color=0xffdf7c)

@@ -723,8 +723,8 @@ async def 닉네임변경(ctx, *, 새_닉네임: str):
 async def 치우(ctx):
     await ctx.send("서버 내 최고 알파메일") 
 
-@bot.command(name="디카프리오")  
-async def 디카프리오(ctx):
+@bot.command(name="낭만전사")  
+async def 낭만전사(ctx):
     await ctx.send('서버 내 핵폭탄급 존재감')  
     
 @bot.command(name="수빈")  
